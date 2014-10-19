@@ -1,0 +1,12 @@
+services:
+    newscoop_instagram_plugin.lifecyclesubscriber:
+        class: Newscoop\InstagramPluginBundle\EventListener\LifecycleSubscriber
+        arguments:
+            - @em
+        tags:
+            - { name: kernel.event_subscriber}
+
+    newscoop_instagram_plugin.instagram_service:
+        class: Newscoop\InstagramPluginBundle\Services\InstagramService
+        arguments:
+            - @service_container
