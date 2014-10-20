@@ -12,29 +12,43 @@
  * @param bool $repeat
  * @return string
  */
-function smarty_block_list_youtube_videos(array $params, $content, &$smarty, &$repeat)
+
+use Newscoop\InstagramPluginBundle\Entity\InstagramPhoto;
+
+function smarty_block_list_instagram_photos(array $params, $content, &$smarty, &$repeat)
 {
     if (empty($params['tag'])) {
         return;
     }
 
     $container = \Zend_Registry::get('container');
+    $em = $container->get('em');
     $cacheService = $container->get('newscoop.cache');
-    $config = $container->getParameter('instagram_plugin');
-    $cacheKey = $cacheService->getCacheKey("photos_found_" . $tag , 'instagram_photos');
+    $cacheKey = "instagram_photos_list_" . $params['tag'];
 
     if (!isset($content)) {
         // load the list from entites InstagramPhoto
-        $cacheService->save($cacheKey, ($results['json']));
+        try {
+            $photos = $em->getRepository('Newscoop\InstagramPluginBundle\Entity\InstagramPhoto')
+                ->createQueryBuilder('p')
+                ->where('p.tags LIKE :tag')
+                ->setParameter('tag', '%'.$params['tag'].'%')
+                ->addOrderBy('p.createdAt', 'DESC')
+                ->getQuery()
+                ->getResult();
+            $cacheService->save($cacheKey, $photos);
+        } catch(\Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 
-    $photos = json_decode($cacheService->fetch($cacheKey), true);
+    $photos = $cacheService->fetch($cacheKey);
 
     if (!empty($photos)) {
         // load the current record
         $photo = array_shift($photos);
-        $smarty->assign('photo', $photo['json']); 
-        $cacheService->save($cacheKey, json_encode($photos));
+        $smarty->assign('photo', $photo); 
+        $cacheService->save($cacheKey, $photos);
         $repeat = true;
     } else {
         $repeat = false;

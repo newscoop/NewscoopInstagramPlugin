@@ -20,6 +20,23 @@ use Symfony\Component\HttpFoundation\Response;
 class InstagramController extends Controller
 {
     /**
+     * @Route("/photolist")
+     */
+    public function photoListAction(Request $request)
+    {
+        // this is just an example page to show how to use the smarty {{ list_instagram_photo }} block
+        $templatesService = $this->container->get('newscoop.templates.service');
+        $smarty = $templatesService->getSmarty();
+        $templateDir = array_shift($smarty->getTemplateDir());
+        $templateFile = __DIR__ . "/../Resources/views/Instagram/instagram_photo_list.tpl";
+        $response = new Response();
+        $response->headers->set('Content-Type', 'text/html');
+        $response->setContent($templatesService->fetchTemplate($templateFile));
+        return $response;
+
+    }
+
+    /**
      * @Route("/photos/{id}")
      */
     public function photosAction($id, Request $request)

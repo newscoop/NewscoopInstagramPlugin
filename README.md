@@ -4,7 +4,7 @@ NewscoopInstagramBundle
 Instagram Photo View
 ------------------------
 
-Provides endpoint for viewing single instagram photos cached locally.  Loads template **Resources/views/Instagram/instagram_photo.tpl** or **_views/instagram_photo.tpl** if it exists in the loaded theme.
+Provides endpoint, **/instagram/photos/{id}** for viewing single instagram photos cached locally.  Loads template **Resources/views/Instagram/instagram_photo.tpl** or **_views/instagram_photo.tpl** if it exists in the loaded theme.
 
 Usage:
 ```smarty
@@ -51,3 +51,13 @@ Usage:
   <p>{{$photo.link}}</p>
 {{ /list_instagram_photos }}
 ```
+
+Instagram Photo Ingest Console Command
+------------------------
+
+Usage:
+```
+php application/console instagram_photos:ingest lennonwall
+```
+
+where **lennonwall** is the instagram hashtag that you wish to import from
