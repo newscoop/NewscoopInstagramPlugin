@@ -33,8 +33,8 @@ Requires the following parameters to be defined in newscoop/application/configs/
 ```
 parameters:
     instagram_bundle:
-        client_id: "AIzaSyDgk-HEOYiLoespmJtB3BOExYJ1yTg0xZw"
-        client_secret: "https://www.googleapis.com/youtube/v3/"
+        client_id: "96554735526e43ca92ce82915054c5a5"
+        client_secret: "c034d3fd55aa4ab69c58bba8d924a245"
         baseurl: "https://api.instagram.com/v1/"
         max_count: 500
 ```
@@ -42,13 +42,28 @@ parameters:
 Usage:
 ```smarty
 {{ list_instagram_photos tag='lennonwall' }}
-  <p>{{$photo.caption}}</p>
-  <p>{{$photo.created_time}}</p>
-  <p>{{$photo.id}}</p>
-  <p>{{$photo.username}}</p>
-  <p>{{$photo.tags}}</p>
-  <p>{{$photo.location}}</p>
-  <p>{{$photo.link}}</p>
+  <p>{{ $photo.getCaption() }}</p>
+  <p>{{ $photo.getCreatedAt() }}</p>
+  <p>{{ $photo.getId() }}</p>
+  <p>{{ $photo.getInstagramUserName() }}</p>
+  <p>{{ $photo.getTags() }}</p>
+  <p>{{ $photo.getLocationName() }}</p>
+  <p>{{ $photo.getLocationLatitude() }}</p>
+  <p>{{ $photo.getLocationLingitude() }}</p>
+  <p>{{ $photo.getLink() }}</p>
+
+  <p>{{ $photo.getThumbnailUrl() }}</p>
+  <p>{{ $photo.getThumbnailWidth() }}</p>
+  <p>{{ $photo.getThumbnailHeight() }}</p>
+
+  <p>{{ $photo.getStandardResolutionUrl() }}</p>
+  <p>{{ $photo.getStandardResolutionWidth() }}</p>
+  <p>{{ $photo.getStandardResolutionThumbnailHeight() }}</p>
+
+  <p>{{ $photo.getLowResolutionUrl() }}</p>
+  <p>{{ $photo.getLowResolutionWidth() }}</p>
+  <p>{{ $photo.getLowResolutionHeight() }}</p>
+
 {{ /list_instagram_photos }}
 ```
 
