@@ -1,0 +1,16 @@
+{% extends 'NewscoopNewscoopBundle::admin_layout.html.twig' %}
+
+{% block admin_title %}{{ parent() }} - {{ 'ads.menu.manage'|trans }}{% endblock %}
+{% block admin_page_title_content %}{{ 'ads.menu.manage'|trans }}{% endblock %}
+
+{% block admin_stylesheets %}
+<link rel="stylesheet" href="{{ asset('/bundles/newscoopnewscoop/css/jquery.dynatable.css') }}">
+<link rel="stylesheet" href="{{ asset('/bundles/ahsadvertsplugin/css/backend.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<div class="plugin-container">
+    <h4>Instagram Admin</h4>
+</div>
+{% endblock %}
+
