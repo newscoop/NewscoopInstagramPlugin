@@ -56,16 +56,6 @@ Instagram List Photos Smarty Block
 ------------------------
 
 Provides a smarty block to list instagrams photos with a specfific hashtag.
-Requires the following parameters to be defined in newscoop/application/configs/parameters/custom_parameters.yml 
-
-```
-parameters:
-    instagram_bundle:
-        client_id: "96554735526e43ca92ce82915054c5a5"
-        client_secret: "c034d3fd55aa4ab69c58bba8d924a245"
-        baseurl: "https://api.instagram.com/v1/"
-        max_count: 500
-```
 
 Usage:
 ```smarty
