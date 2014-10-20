@@ -2,5 +2,6 @@
 
 {{ list_instagram_photos tag="lennonwall" length=30 }}
   <img src="{{ $photo->getThumbnailUrl() }}" width="{{ $photo->getThumbnailWidth() }}" height="{{ $photo->getThumbnailHeight() }}">
+  {{ $photoIndex }}
 {{ /list_instagram_photos }}
 

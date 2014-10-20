@@ -56,6 +56,7 @@ function smarty_block_list_instagram_photos(array $params, $content, &$smarty, &
         // load the current record
         $photo = array_shift($photos);
         $smarty->assign('photo', $photo); 
+        $smarty->assign('photoIndex', abs(count($photos) - $length)); 
         $cacheService->save($cacheKey, $photos);
         $repeat = true;
     } else {
