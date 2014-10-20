@@ -1,6 +1,30 @@
 NewscoopInstagramBundle
 ===================
 
+Install instructions for Newscoop v4.3
+------------------------
+
+1. Download this repo from github with 'Download ZIP' button
+2. Login to Newscoop Admin and go to Plugins->ManagerPlugins menu
+3. Click 'Private Plugins' tab on the dialog
+4. Upload the downloaded ZIP file to Newscoop using the 'Choose File' and 'Upload' buttons in the 'Upload private plugin' section of the form
+5. Edit the newscoop/application/config/parameters/custom_parameters.yml file (or create it if it does not exist) and add the following text:
+```
+parameters:
+    instagram_bundle:
+        client_id: "96554735526e43ca92ce82915054c5a5"
+        client_secret: "c034d3fd55aa4ab69c58bba8d924a245"
+        baseurl: "https://api.instagram.com/v1/"
+        max_count: 500
+```
+
+6. Run the following command from the shell:
+```
+php application/console plugin:install newscoop/instagram-plugin-bundle
+```
+
+
+
 Instagram Photo View
 ------------------------
 
