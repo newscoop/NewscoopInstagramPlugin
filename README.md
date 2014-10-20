@@ -59,7 +59,8 @@ Provides a smarty block to list instagrams photos with a specfific hashtag.
 
 Usage:
 ```smarty
-{{ list_instagram_photos tag='lennonwall' }}
+{{ list_instagram_photos tag='lennonwall'  length=30 }}
+  <p>{{ $photoIndex }}</p>
   <p>{{ $photo.getCaption() }}</p>
   <p>{{ $photo.getCreatedAt() }}</p>
   <p>{{ $photo.getId() }}</p>
