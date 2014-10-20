@@ -1,7 +1,7 @@
 newscoop_instagram_plugin:
     resource: "@NewscoopInstagramPluginBundle/Controller"
     type:     annotation
-    prefix:   /
+    prefix:   /instagram
 gimme:
     type: rest
     prefix: /content-api

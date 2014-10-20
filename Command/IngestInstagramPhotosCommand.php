@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Newscoop\InstagramPluginBundle\Entity\InstagramPhoto;
 
 /**
  * Gets instagram photos via instagram api by hashtag and insert into plugin_instagram_photo 
@@ -37,22 +38,58 @@ class IngestInstagramPhotosCommand extends ContainerAwareCommand
         $clientId = $config['client_id'];
         $maxCount = $config['max_count'];
         $tag = $input->getArgument('tag');
-        $photoCount = 0;
-        $cacheService = $container->get('newscoop.cache');
-        $cacheKey = $cacheService->getCacheKey("photos_found_" . $tag , 'instagram_photos');
-        $url = $baseurl . $tag . "//media/recent?count=" . $maxCount . "&client_id=" . $clientId;
+        $photos = array();
+        $photosAdded = 0;
+        $cacheService = $this->getContainer()->get('newscoop.cache');
+        $cacheKey = $cacheService->getCacheKey(array("tag", $tag), 'instagram_photos');
+        $url = $baseurl . "tags/" . $tag . "/media/recent?client_id=" . $clientId;
 
         try {
             $em = $this->getContainer()->getService('em');
-            $instagramService = $this->getContainer()->getService('newscoop_instagram_plugin.instgram_service');
+            $instagramService = $this->getContainer()->getService('newscoop_instagram_plugin.instagram_service');
 
-            $client = new \Zend_Http_Client($url);
-            $client->setMethod(Zend_Http_Client::GET);
-            $results = json_decode($client->request()->getBody(), true);
-            $cacheService->save($cacheKey, json_encode($results['items']));
-            $photos = json_decode($cacheService->fetch($cacheKey), true);
+            $output->writeln("Looking for " . $cacheKey . " in cache");
+            if ($cacheService->contains($cacheKey)) {
+                // TODO: figure out why this is never happening for some reason
+                $photos = json_decode($cacheService->fetch($cacheKey), true);
+                $output->writeln("Loaded " . count($photos) . " photos from cache");
+            } else {
+                $client = new \Buzz\Client\Curl();
+                $client->setTimeout(3600);
+                $browser = new \Buzz\Browser($client);
+                $response =  $browser->get($url);
+                $results = json_decode($response->getContent(), true);
 
-            $output->writeln('<info>Finished... '.$photoCount.' records ingested...</info>');
+                // we must paginate through all the results
+                while (count($photos) < $maxCount) {
+                    $photos = array_merge($photos, $results['data']); 
+                    $output->writeln("...recieved " . count($photos) . " photos");
+                    if ($results['pagination']['next_url']) {
+                        $nextUrl = $results['pagination']['next_url'];
+                        $response =  $browser->get($nextUrl);
+                        $results = json_decode($response->getContent(), true);
+                    } else {
+                        // we aren't going to get $maxCount
+                        break;
+                    }
+                }
+
+                $output->writeln("Saving " . $cacheKey . " in cache");
+                $cacheService->save($cacheKey, json_encode($photos));
+            }
+
+            $output->writeln("Processing " . count($photos) . " photos...");
+            foreach ($photos as $photo) {
+                // check if we already have this photo
+                if (!$instagramService->exists($photo['id'])) {
+                    $output->writeln("Adding " . $photo['id']);
+                    $instagramPhoto = $instagramService->saveInstagramPhoto($photo);
+                    $photosAdded++;
+                }
+            }
+
+            $output->writeln('<info>Finished...' . $photosAdded . ' records ingested.</info>');
+
         } catch (\Exception $e) {
             $output->writeln('<error>Error occured: '.$e->getMessage().'</error>');
 

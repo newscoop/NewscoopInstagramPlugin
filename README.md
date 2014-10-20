@@ -1,7 +1,30 @@
 NewscoopInstagramBundle
 ===================
 
-Tag View
+Instagram Photo View
+------------------------
+
+Provides endpoint for viewing single instagram photos cached locally.  Loads template **Resources/views/Instagram/instagram_photo.tpl** or **_views/instagram_photo.tpl** if it exists in the loaded theme.
+
+Usage:
+```smarty
+<img src="{{ $instagramPhoto->getThumbnailUrl() }}" width="{{ $instagramPhoto->getThumbnailWidth() }}" height="{{ $instagramPhoto->getThumbnailHeight() }}">
+
+<img src="{{ $instagramPhoto->getLowResolutionUrl() }}" width="{{ $instagramPhoto->getLowResolutionWidth() }}" height="{{ $instagramPhoto->getLowResolutionHeight() }}">
+
+<img src="{{ $instagramPhoto->getStandardResolutionUrl() }}" width="{{ $instagramPhoto->getStandardResolutionWidth() }}" height="{{ $instagramPhoto->getStandardResolutionHeight() }}">
+
+<p>Id: {{ $instagramPhoto->getId() }}</p>
+<p>Link: {{ $instagramPhoto->getLink() }}</p>
+<p>Caption: {{ $instagramPhoto->getCaption() }}</p>
+<p>Tags: {{ $instagramPhoto->getTags() }}</p>
+<p>Created by Instagram User: {{ $instagramPhoto->getInstagramUserName() }}</p>
+<p>Created on: {{ $instagramPhoto->getCreatedAt()|date_format:"Y-m-d" }}</p>
+```
+
+
+
+Instagram List Photos Smarty Block
 ------------------------
 
 Provides a smarty block to list instagrams photos with a specfific hashtag.

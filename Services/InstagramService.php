@@ -5,11 +5,10 @@
  * @author Mark Lewis <mark.lewis@sourcefabric.org>
  */
 
-namespace Newscoop\InstagramPluginBundle\Service;
+namespace Newscoop\InstagramPluginBundle\Services;
 
-use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManager;
 use Newscoop\InstagramPluginBundle\Entity\InstagramPhoto;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
@@ -31,7 +30,7 @@ class InstagramService
     /**
      * Delete photo by given id
      *
-     * @param int|string $id Classified id
+     * @param int|string $id InstagramPhoto id
      *
      * @return boolean
      */
@@ -84,15 +83,86 @@ class InstagramService
     }
 
     /**
-     * Count photos by given criteria
+     * Tests if a photo already exists by given id
      *
-     * @param array $criteria
+     * @param string $id
      *
-     * @return int
+     * @return bool
      */
-    public function countBy(array $criteria = array())
+    public function exists($id)
     {
-        return $this->getRepository()->countBy($criteria);
+        $em = $this->container->get('em');
+        $photo = $this->getRepository()
+            ->findOneById($id);
+
+        if ($photo) {
+          return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Takes JSON response from the instagram api and saves an Entity\InstagramPhoto
+     *
+     * @param text $photo
+     *
+     * @return Entity\InstagramPhoto
+     */
+    public function saveInstagramPhoto($photo)
+    {
+        $em = $this->container->get('em');
+
+        try {
+            //TODO: extract relational data from json
+            $instagramPhoto = new InstagramPhoto();
+            $instagramPhoto->setId($photo['id'])
+                ->setTags(implode(",", $photo['tags']))
+                ->setLink($photo['link'])
+                ->setLocationName($photo['location']['name'])
+                ->setLocationLongitude($photo['location']['longitude'])
+                ->setLocationLatitude($photo['location']['latitude'])
+                ->setInstagramUserId($photo['user']['id'])
+                ->setInstagramUserName($photo['user']['username'])
+                ->setLowResolutionUrl($photo['images']['low_resolution']['url'])
+                ->setLowResolutionWidth($photo['images']['low_resolution']['width'])
+                ->setLowResolutionHeight($photo['images']['low_resolution']['height'])
+                ->setThumbnailUrl($photo['images']['thumbnail']['url'])
+                ->setThumbnailWidth($photo['images']['thumbnail']['width'])
+                ->setThumbnailHeight($photo['images']['thumbnail']['height'])
+                ->setStandardResolutionUrl($photo['images']['standard_resolution']['url'])
+                ->setStandardResolutionWidth($photo['images']['standard_resolution']['width'])
+                ->setStandardResolutionHeight($photo['images']['standard_resolution']['height'])
+                ->setCaption($photo['caption']['text'])
+                ->setCreatedAt(new \DateTime(date('Y-m-d H:i:s',$photo['created_time'])))
+                ->setJson(json_encode($photo));
+            $em->persist($instagramPhoto);
+            $em->flush();
+        } catch (\Exception $e) {
+            print('Error: ' . $e->getMessage() . "\n");
+        }
+
+        return $instagramPhoto;
+    }
+
+    /**
+     * Get photo by given id
+     *
+     * @param int|string $id IstagramPhoto id
+     *
+     * @return InstagramPhoto
+     */
+    public function getInstagramPhotoById($id)
+    {
+        $em = $this->container->get('em');
+        $photo = $this->getRepository()
+            ->findOneById($id);
+
+        if ($photo) {
+            return $photo;
+        }
+        
+        return false;
     }
 
     /**
