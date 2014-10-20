@@ -1,5 +1,8 @@
-NewscoopInstagramBundle
+NewscoopInstagramPluginBundle
 ===================
+
+This Newscoop Plugin adds smarty functions and Admin tools to enable you to ingest, manage, and display Instagram photos in Newscoop.
+
 
 Install instructions for Newscoop v4.3
 ------------------------
