@@ -22,9 +22,16 @@ function smarty_block_list_instagram_photos(array $params, $content, &$smarty, &
     }
 
     $container = \Zend_Registry::get('container');
+    $config = $container->getParameter('instagram_bundle');
     $em = $container->get('em');
     $cacheService = $container->get('newscoop.cache');
     $cacheKey = "instagram_photos_list_" . $params['tag'];
+
+    if ($params['length']) {
+        $length = $params['length'];
+    } else {
+        $length = $config['max_count'];
+    }
 
     if (!isset($content)) {
         // load the list from entites InstagramPhoto
@@ -34,6 +41,7 @@ function smarty_block_list_instagram_photos(array $params, $content, &$smarty, &
                 ->where('p.tags LIKE :tag')
                 ->setParameter('tag', '%'.$params['tag'].'%')
                 ->addOrderBy('p.createdAt', 'DESC')
+                ->setMaxResults($length)
                 ->getQuery()
                 ->getResult();
             $cacheService->save($cacheKey, $photos);
