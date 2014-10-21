@@ -17,11 +17,22 @@ use Newscoop\EventDispatcher\Events\GenericEvent;
 class LifecycleSubscriber implements EventSubscriberInterface
 {
     private $em;
+    
+    protected $scheduler;
 
+    protected $cronjobs;
 
-    public function __construct($em)
+    public function __construct($em, SchedulerService $scheduler)
     {
+        $appDirectory = realpath(__DIR__.'/../../../../application/console');
         $this->em = $em;
+        $this->scheduler = $scheduler;
+        $this->cronjobs = array(
+            "Instagram plugin ingest photos cron job" => array(
+                'command' => $appDirectory . ' instagram_photos:ingest lennonwal 40',
+                'schedule' => '*/15 * * * *',
+            )
+        );
     }
 
     public function install(GenericEvent $event)
@@ -31,6 +42,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
 
         // Generate proxies for entities
         $this->em->getProxyFactory()->generateProxyClasses($this->getClasses(), __DIR__ . '/../../../../library/Proxy');
+        $this->addJobs();
     }
 
     public function update(GenericEvent $event)
@@ -55,6 +67,16 @@ class LifecycleSubscriber implements EventSubscriberInterface
             'plugin.update.newscoop_instagram_plugin_bundle' => array('update', 1),
             'plugin.remove.newscoop_instagram_plugin_bundle' => array('remove', 1),
         );
+    }
+
+    /**
+     * Add plugin cron jobs
+     */
+    private function addJobs()
+    {
+        foreach ($this->cronjobs as $jobName => $jobConfig) {
+            $this->scheduler->registerJob($jobName, $jobConfig);
+        }
     }
 
     private function getClasses()

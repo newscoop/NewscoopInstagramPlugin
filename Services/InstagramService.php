@@ -166,6 +166,19 @@ class InstagramService
     }
 
     /**
+     * Count phtos by given criteria                                                                                                                  
+     *
+     * @param array $criteria                                                                                                                               
+     *
+     * @return int                                                                                                                                          
+     */
+    public function countBy(array $criteria = array())                                                                                                      
+    {   
+        return $this->getRepository()->countBy($criteria);                                                                                                  
+    }
+
+
+    /**
      * Get repository for announcments entity
      *
      * @return Newscoop\InstagramPluginBundle\Repository

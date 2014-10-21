@@ -17,34 +17,19 @@
 <div class="plugin-container">
     <h4>Instagram Photos</h4>
     <table id="photos-table" class="table table-bordered table-hover" style="word-wrap: break-word;table-layout: fixed;">
-        <tbody>
         <thead>
             <tr>
-                <th style="width: 120px;" >Thumbnail</th>
-                <th>Instagram User</th>
-                <th>Tags</th>
-                <th>Caption</th>
-                <th>LocationName</th>
-                <th>Instagram Created</th>
-                <th>Active</th>
+                <th data-dynatable-column="thumbnailUrl" style="width: 120px;" >Thumbnail</th>
+                <th data-dynatable-column="instagramUserName">Instagram User</th>
+                <th data-dynatable-column="tags">Tags</th>
+                <th data-dynatable-column="caption">Caption</th>
+                <th data-dynatable-column="locationName">LocationName</th>
+                <th data-dynatable-column="createdAt">Instagram Created</th>
+                <th data-dynatable-column="isActive">Active</th>
             </tr>
         </thead>
-        {% for photo in photos %}
-            <tr>
-                <td><img src="{{ photo.thumbnailUrl }}" width="100" height="100"></td>
-                <td>{{ photo.instagramUserName }}</td>
-                <td>
-                    {% for tag in photo.tags|split(',') %}
-                        {{ tag }}&nbsp;
-                    {% endfor %}
-                </td>
-                <td>{{ photo.caption }}</td>
-                <td>{{ photo.locationName }}</td>
-                <td>{{ photo.createdAt|date('Y-m-d H:m') }}</td>
-                <td><button class="dynatable-photo-status" data-instagram-id="{{ photo.id }}">{% if photo.isActive %}ACTIVE{% else %}HIDDEN{% endif %}</button></td>
-            </tr>
-        {% endfor %}
-    </tbody>
+        <tbody>
+        </tbody>
     </table>
 </div>
 
@@ -58,15 +43,47 @@
             paginationNext: '&raquo;',
         },
         dataset: {
+            ajax: true,
+            ajaxUrl: Routing.generate('newscoop_instagramplugin_admin_loadphotos'),
+            ajaxOnLoad: false,
+            records: [],
             perPageDefault: 5,
             perPageOptions: [5,10,20,50,100],
         },
         features: {
             paginate: true,
+        },
+        writers: {
+            _cellWriter: function (column, record) {
+                if (column.id == 'thumbnailUrl') {
+                    return "<td><img src='"+record.thumbnailUrl+"' width='100' height='100'></td>"; 
+                }
+                if (column.id == 'instagramUserName') {
+                    return "<td>"+record.instagramUserName+"</td>";
+                }
+                if (column.id == 'tags') {
+                    return "<td>"+record.tags+"</td>";
+                }
+                if (column.id == 'caption') {
+                    return "<td>"+record.caption+"</td>";
+                }
+                if (column.id == 'locationName') {
+                    return "<td>"+record.locationName+"</td>";
+                }
+                if (column.id == 'createdAt') {
+                    return "<td>"+record.createdAt.date+"</td>";
+                }
+                if (column.id == 'isActive') {
+                    if (record.isActive) {
+                        return "<td><button class='btn btn-xs btn-default action-btn dynatable-photo-status' data-instagram-id='"+record.id+"'>ACTIVE</button></td>";
+                    }
+                    return "<td><button class='btn btn-xs btn-default action-btn dynatable-photo-status' data-instagram-id='"+record.id+"'>HIDDEN</button></td>";
+                }
+            }
         }
-    });
+    }).data('dynatable');
 
-    $('.dynatable-photo-status').click(function(e){
+    $('.dynatable-photo-status').live('click', function(e){
         var photoId = $(this).attr('data-instagram-id');
         var state = $(this).html();
         var that = $(this);

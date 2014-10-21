@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * InstagramPhoto entity
  *
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Newscoop\InstagramPluginBundle\Repository\InstagramPhotoRepository")
  * @ORM\Table(name="plugin_instagram_photo")
  */
 class InstagramPhoto
@@ -149,7 +149,7 @@ class InstagramPhoto
      * @ORM\Column(type="boolean", name="is_active")
      * @var boolean
      */
-    protected $is_active;
+    protected $isActive;
 
     public function __construct()
     {
@@ -638,25 +638,25 @@ class InstagramPhoto
     }
 
     /**
-     * Gets the value of is_active.
+     * Gets the value of isActive.
      *
      * @return boolean
      */
     public function getIsActive()
     {
-        return $this->is_active;
+        return $this->isActive;
     }
 
     /**
-     * Sets the value of is_active.
+     * Sets the value of isActive.
      *
-     * @param boolean $is_active the is  active
+     * @param boolean $isActive the is  active
      *
      * @return self
      */
-    public function setIsActive($is_active)
+    public function setIsActive($isActive)
     {
-        $this->is_active = $is_active;
+        $this->isActive = $isActive;
 
         return $this;
     }

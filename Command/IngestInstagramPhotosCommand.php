@@ -26,6 +26,7 @@ class IngestInstagramPhotosCommand extends ContainerAwareCommand
         $this
         ->setName('instagram_photos:ingest')
         ->addArgument('tag', InputArgument::REQUIRED, 'instagram hashtag')
+        ->addArgument('pull', InputArgument::OPTIONAL, 'number of photos to load from instagram')
         ->setDescription('Gets instagram photos by tag and insert into plugin_instagram_photo');
     }
 
@@ -38,11 +39,15 @@ class IngestInstagramPhotosCommand extends ContainerAwareCommand
         $clientId = $config['client_id'];
         $maxCount = $config['max_count'];
         $tag = $input->getArgument('tag');
+        $pull = $input->getArgument('pull');
         $photos = array();
         $photosAdded = 0;
         $cacheService = $this->getContainer()->get('newscoop.cache');
         $cacheKey = $cacheService->getCacheKey(array("tag", $tag), 'instagram_photos');
         $url = $baseurl . "tags/" . $tag . "/media/recent?client_id=" . $clientId;
+        if ($pull) {
+            $maxCount = $pull;
+        }
 
         try {
             $em = $this->getContainer()->getService('em');
