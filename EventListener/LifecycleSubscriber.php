@@ -22,7 +22,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
 
     protected $cronjobs;
 
-    public function __construct($em, SchedulerService $scheduler)
+    public function __construct($em, $scheduler)
     {
         $appDirectory = realpath(__DIR__.'/../../../../application/console');
         $this->em = $em;
