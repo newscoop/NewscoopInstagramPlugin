@@ -36,7 +36,8 @@ Update instructions for Newscoop v4.3 on OSX with MAMP
 2. edit plugins/available_plugins.json and remove text: "Newscoop\\InstagramPluginBundle\\NewscoopInstagramPluginBundle"
 3. edit composer.json and remove the line: "newscoop/instagram-plugin-bundle": "*", in the "require" section
 4. rm -rf plugins/private_plugins/newscoop-instagram-plugin-bundle-0.0.1.zip
-5. follow steps for manual install above
+5. rm -rf cache/*
+6. follow steps for manual install above
 
 
 
