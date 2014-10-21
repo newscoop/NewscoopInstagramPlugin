@@ -62,8 +62,46 @@ Usage:
 <p>Created on: {{ $instagramPhoto->getCreatedAt()|date_format:"Y-m-d" }}</p>
 ```
 
+Instagram Photos Search 
+------------------------
 
+Note that this only searches the locally stored InstagramPhoto entities, it does NOT make a call to the Instagram Api
 
+Provides endpoint **/instagram/photosearch**, which takes the following params:
+
+1. search - search string, matches against caption, username, tags, and locationName fields
+2. perPage - number of records per page to send in the results
+3. offset - the first record to start with (used for pagination)
+
+Results are delivered to **_views/instagram_search_results.tpl**, if defined in your theme, or a default internal view is used.
+
+Usage:
+```smarty
+<div id="nav">
+   <div class="left-nav"><a href="{{ $prevPageUrl }}">Previous</a></div>
+   <div class="center-nav"><span>found {{ $instagramPhotoCount }} results</span></div>
+   <div class="right-nav"><a href="{{ $nextPageUrl }}">Next</a></div>
+</div>
+<br class="clear">
+
+<ul id="photo-results-container">
+{{ foreach $instagramPhotos as $photo }}
+    <li>
+        <div id="box" style="background: url({{ $photo->getLowResolutionUrl() }})">
+            <div id="overlay">
+                <span id="plus">
+                    Posted By: {{ $photo->getInstagramUserName() }}<br>
+                    On: {{ $photo->getCreatedAt()|date_format:"Y-m-d" }}<br>
+                    <br>
+                    {{ $photo->getCaption() }}
+                </span>
+            </div>
+        </div>
+    </li>
+{{ /foreach }}
+</ul>
+```
+ 
 Instagram List Photos Smarty Block
 ------------------------
 

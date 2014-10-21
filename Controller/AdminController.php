@@ -37,14 +37,11 @@ class AdminController extends Controller
         $em = $this->get('em');
         $cacheService = $this->get('newscoop.cache');
         $instagramService = $this->container->get('newscoop_instagram_plugin.instagram_service');
-        $zendRouter = $this->get('zend_router');                                                                                                            
-        
         $criteria = $this->processRequest($request);
         $photosCount = $instagramService->countBy(array('isActive' => true)); 
         $photosInactiveCount = $instagramService->countBy(array('isActive' => false));
       
         $cacheKey = array('instagram_photos__'.md5(serialize($criteria)), $photosCount, $photosInactiveCount);
-        $cacheKey = array('instagram_photos__'.md5(serialize($criteria)));
         if ($cacheService->contains($cacheKey)) {
             $responseArray = $cacheService->fetch($cacheKey);                                                                                               
         } else { 
