@@ -42,8 +42,6 @@ class IngestInstagramPhotosCommand extends ContainerAwareCommand
         $pull = $input->getArgument('pull');
         $photos = array();
         $photosAdded = 0;
-        $cacheService = $this->getContainer()->get('newscoop.cache');
-        $cacheKey = $cacheService->getCacheKey(array("tag", $tag), 'instagram_photos');
         $url = $baseurl . "tags/" . $tag . "/media/recent?client_id=" . $clientId;
         if ($pull) {
             $maxCount = $pull;
@@ -53,35 +51,26 @@ class IngestInstagramPhotosCommand extends ContainerAwareCommand
             $em = $this->getContainer()->getService('em');
             $instagramService = $this->getContainer()->getService('newscoop_instagram_plugin.instagram_service');
 
-            $output->writeln("Looking for " . $cacheKey . " in cache");
-            if ($cacheService->contains($cacheKey)) {
-                // TODO: figure out why this is never happening for some reason
-                $photos = json_decode($cacheService->fetch($cacheKey), true);
-                $output->writeln("Loaded " . count($photos) . " photos from cache");
-            } else {
-                $client = new \Buzz\Client\Curl();
-                $client->setTimeout(3600);
-                $browser = new \Buzz\Browser($client);
-                $response =  $browser->get($url);
-                $results = json_decode($response->getContent(), true);
+            $client = new \Buzz\Client\Curl();
+            $client->setTimeout(3600);
+            $browser = new \Buzz\Browser($client);
+            $response =  $browser->get($url);
+            $results = json_decode($response->getContent(), true);
 
-                // we must paginate through all the results
-                while (count($photos) < $maxCount) {
-                    $photos = array_merge($photos, $results['data']); 
-                    $output->writeln("...recieved " . count($photos) . " photos");
-                    if ($results['pagination']['next_url']) {
-                        $nextUrl = $results['pagination']['next_url'];
-                        $response =  $browser->get($nextUrl);
-                        $results = json_decode($response->getContent(), true);
-                    } else {
-                        // we aren't going to get $maxCount
-                        break;
-                    }
+            // we must paginate through all the results
+            while (count($photos) < $maxCount) {
+                $photos = array_merge($photos, $results['data']); 
+                $output->writeln("...recieved " . count($photos) . " photos");
+                if ($results['pagination']['next_url']) {
+                    $nextUrl = $results['pagination']['next_url'];
+                    $response =  $browser->get($nextUrl);
+                    $results = json_decode($response->getContent(), true);
+                } else {
+                    // we aren't going to get $maxCount
+                    break;
                 }
-
-                $output->writeln("Saving " . $cacheKey . " in cache");
-                $cacheService->save($cacheKey, json_encode($photos));
             }
+
 
             $output->writeln("Processing " . count($photos) . " photos...");
             foreach ($photos as $photo) {
