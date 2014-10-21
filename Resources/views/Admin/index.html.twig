@@ -5,38 +5,92 @@
 
 {% block admin_stylesheets %}
 <link rel="stylesheet" href="{{ asset('/bundles/newscoopnewscoop/css/jquery.dynatable.css') }}">
-<link rel="stylesheet" href="{{ asset('/bundles/ahsadvertsplugin/css/backend.css') }}">
+<link rel="stylesheet" href="{{ asset('/bundles/newscoopinstagramplugin/css/backend.css') }}">
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ asset('/js/select2/select2.js') }}"></script>
+<script src="{{ asset('/bundles/newscoopnewscoop/js/jquery.dynatable.js') }}"></script>
 {% endblock %}
 
 {% block admin_content %}
 <div class="plugin-container">
     <h4>Instagram Photos</h4>
-    <table class="table">
+    <table id="photos-table" class="table table-bordered table-hover" style="word-wrap: break-word;table-layout: fixed;">
         <tbody>
-        <tr>
-            <td>Thumbnail</td>
-            <td>Instagram User</td>
-            <td>Tags</td>
-            <td>LocationName</td>
-            <td>Instagram Created</td>
-            <td>Active</td>
-        </tr>
+        <thead>
+            <tr>
+                <th style="width: 120px;" >Thumbnail</th>
+                <th>Instagram User</th>
+                <th>Tags</th>
+                <th>Caption</th>
+                <th>LocationName</th>
+                <th>Instagram Created</th>
+                <th>Active</th>
+            </tr>
+        </thead>
         {% for photo in photos %}
             <tr>
                 <td><img src="{{ photo.thumbnailUrl }}" width="100" height="100"></td>
                 <td>{{ photo.instagramUserName }}</td>
                 <td>
                     {% for tag in photo.tags|split(',') %}
-                        {{ tag }}<br>
+                        {{ tag }}&nbsp;
                     {% endfor %}
                 </td>
+                <td>{{ photo.caption }}</td>
                 <td>{{ photo.locationName }}</td>
                 <td>{{ photo.createdAt|date('Y-m-d H:m') }}</td>
-                <td>{{ photo.isActive }}</td>
+                <td><button class="dynatable-photo-status" data-instagram-id="{{ photo.id }}">{% if photo.isActive %}ACTIVE{% else %}HIDDEN{% endif %}</button></td>
             </tr>
         {% endfor %}
     </tbody>
     </table>
 </div>
+
+<script type="text/javascript">
+    var dynatable = $('#photos-table').dynatable({
+        inputs: {
+            paginationClass: 'pagination',
+            paginationActiveClass: 'current',
+            paginationDisabledClass: 'unavailable',
+            paginationPrev: '&laquo;',
+            paginationNext: '&raquo;',
+        },
+        dataset: {
+            perPageDefault: 5,
+            perPageOptions: [5,10,20,50,100],
+        },
+        features: {
+            paginate: true,
+        }
+    });
+
+    $('.dynatable-photo-status').click(function(e){
+        var photoId = $(this).attr('data-instagram-id');
+        var state = $(this).html();
+        var that = $(this);
+
+        if (state === "ACTIVE") {
+            var url = '/admin/instagram/deactivate/' + photoId;
+            state = "HIDDEN";
+        } else {
+            var url = '/admin/instagram/activate/' + photoId;
+            state = "ACTIVE";
+        }
+
+        $.post(url)
+            .done(function(data) {
+              if (data.status) {
+                flashMessage('Photo active status updated sucessfully');
+                that.html(state);
+                return true;
+            }
+
+            flashMessage('Error updating photo status', 'error');
+        });
+    });
+</script>
+
 {% endblock %}
 

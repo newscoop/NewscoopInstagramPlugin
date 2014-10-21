@@ -39,6 +39,7 @@ function smarty_block_list_instagram_photos(array $params, $content, &$smarty, &
             $photos = $em->getRepository('Newscoop\InstagramPluginBundle\Entity\InstagramPhoto')
                 ->createQueryBuilder('p')
                 ->where('p.tags LIKE :tag')
+                ->andWhere('p.is_active = 1')
                 ->setParameter('tag', '%'.$params['tag'].'%')
                 ->addOrderBy('p.createdAt', 'DESC')
                 ->setMaxResults($length)

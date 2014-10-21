@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 class InstagramController extends Controller
 {
     /**
-     * @Route("/photolist")
+     * @Route("/instagram/photolist")
      */
     public function photoListAction(Request $request)
     {
@@ -37,7 +37,7 @@ class InstagramController extends Controller
     }
 
     /**
-     * @Route("/photos/{id}")
+     * @Route("/instagram/photos/{id}")
      */
     public function photosAction($id, Request $request)
     {

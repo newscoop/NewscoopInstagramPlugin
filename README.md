@@ -4,7 +4,7 @@ NewscoopInstagramPluginBundle
 This Newscoop Plugin adds smarty functions and Admin tools to enable you to ingest, manage, and display Instagram photos in Newscoop.
 
 
-Install instructions for Newscoop v4.3
+Install instructions for Newscoop v4.3 on OSX with MAMP
 ------------------------
 
 1. Download this repo from github with 'Download ZIP' button
@@ -61,27 +61,27 @@ Usage:
 ```smarty
 {{ list_instagram_photos tag='lennonwall'  length=30 }}
   <p>{{ $photoIndex }}</p>
-  <p>{{ $photo.getCaption() }}</p>
-  <p>{{ $photo.getCreatedAt() }}</p>
-  <p>{{ $photo.getId() }}</p>
-  <p>{{ $photo.getInstagramUserName() }}</p>
-  <p>{{ $photo.getTags() }}</p>
-  <p>{{ $photo.getLocationName() }}</p>
-  <p>{{ $photo.getLocationLatitude() }}</p>
-  <p>{{ $photo.getLocationLingitude() }}</p>
-  <p>{{ $photo.getLink() }}</p>
+  <p>{{ $photo->getCaption() }}</p>
+  <p>{{ $photo->getCreatedAt() }}</p>
+  <p>{{ $photo->getId() }}</p>
+  <p>{{ $photo->getInstagramUserName() }}</p>
+  <p>{{ $photo->getTags() }}</p>
+  <p>{{ $photo->getLocationName() }}</p>
+  <p>{{ $photo->getLocationLatitude() }}</p>
+  <p>{{ $photo->getLocationLingitude() }}</p>
+  <p>{{ $photo->getLink() }}</p>
 
-  <p>{{ $photo.getThumbnailUrl() }}</p>
-  <p>{{ $photo.getThumbnailWidth() }}</p>
-  <p>{{ $photo.getThumbnailHeight() }}</p>
+  <p>{{ $photo->getThumbnailUrl() }}</p>
+  <p>{{ $photo->getThumbnailWidth() }}</p>
+  <p>{{ $photo->getThumbnailHeight() }}</p>
 
-  <p>{{ $photo.getStandardResolutionUrl() }}</p>
-  <p>{{ $photo.getStandardResolutionWidth() }}</p>
-  <p>{{ $photo.getStandardResolutionThumbnailHeight() }}</p>
+  <p>{{ $photo->getStandardResolutionUrl() }}</p>
+  <p>{{ $photo->getStandardResolutionWidth() }}</p>
+  <p>{{ $photo->getStandardResolutionThumbnailHeight() }}</p>
 
-  <p>{{ $photo.getLowResolutionUrl() }}</p>
-  <p>{{ $photo.getLowResolutionWidth() }}</p>
-  <p>{{ $photo.getLowResolutionHeight() }}</p>
+  <p>{{ $photo->getLowResolutionUrl() }}</p>
+  <p>{{ $photo->getLowResolutionWidth() }}</p>
+  <p>{{ $photo->getLowResolutionHeight() }}</p>
 
 {{ /list_instagram_photos }}
 ```
