@@ -30,12 +30,18 @@ class InstagramController extends Controller
         $templatesService = $this->container->get('newscoop.templates.service');
         $instagramService = $this->container->get('newscoop_instagram_plugin.instagram_service');
         $criteria = new InstagramPhotoCriteria();
-        if ($request->query->has('search')) {
-            $criteria->query = $request->query->get('search');
+        
+        // params
+        $search = $this->_getParam('search');
+        $perPage = $this->_getParam('perPage');
+        $offset = $this->_getParam('offset');
+
+        if ($search) {
+            $criteria->query = $search;
         }        
-        $criteria->maxResults = $request->query->get('perPage', 10);
-        if ($request->query->has('offset')) {
-            $criteria->firstResult = $request->query->get('offset');
+        $criteria->maxResults = ($perPage) ? $perPage: '10';
+        if ($offset) {
+            $criteria->firstResult = $offset;
         }
         $cacheKey = array('instagram_photos__'.md5(serialize($criteria)));
 
@@ -57,8 +63,8 @@ class InstagramController extends Controller
             $templateFile = __DIR__ . "/../Resources/views/Instagram/instagram_search_results.tpl";
         }
 
-        $next = ($request->query->get('offset')+$criteria->maxResults);
-        $prev = ($request->query->get('offset')-$criteria->maxResults);
+        $next = ($offset + $criteria->maxResults);
+        $prev = ($offset - $criteria->maxResults);
         if ($next < count($photos)) { 
             $nextPageUrl = $this->generateUrl('newscoop_instagramplugin_instagram_photosearch', array(
                 'search' => $request->query->get('search'),
@@ -138,6 +144,20 @@ class InstagramController extends Controller
             array('instagramPhoto' => $photo)
         ));
         return $response;
+    }
+
+    public function _getParam($param)
+    {
+        if ($this->request !== null) {
+            if ($this->request->request->get($param)) {
+                return $this->request->request->get($param);
+            }
+            if ($this->request->query->get($param)) {
+                return $this->request->query->get($param);
+            }
+        }
+
+        return null;
     }
 }
 
