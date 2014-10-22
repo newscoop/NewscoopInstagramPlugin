@@ -39,7 +39,7 @@ class InstagramController extends Controller
         if ($search) {
             $criteria->query = $search;
         }        
-        $criteria->maxResults = ($perPage) ? $perPage: '10';
+        $criteria->maxResults = ($perPage) ? $perPage: '12';
         if ($offset) {
             $criteria->firstResult = $offset;
         }
@@ -67,9 +67,9 @@ class InstagramController extends Controller
         $prev = ($offset - $criteria->maxResults);
         if ($next < count($photos)) { 
             $nextPageUrl = $this->generateUrl('newscoop_instagramplugin_instagram_photosearch', array(
-                'search' => $request->query->get('search'),
+                'search' => $search,
                 'offset' => $next,
-                'perPage' => $request->query->get('perPage')
+                'perPage' => $perPage
             ));
         } else {
             $nextPageUrl = "#";
@@ -77,9 +77,9 @@ class InstagramController extends Controller
 
         if ($criteria->firstResult > 0) { 
             $prevPageUrl = $this->generateUrl('newscoop_instagramplugin_instagram_photosearch', array(
-                'search' => $request->query->get('search'),
+                'search' => $search,
                 'offset' => $prev,
-                'perPage' => $request->query->get('perPage')
+                'perPage' => $perPage
             ));
         } else {
             $prevPageUrl = "#";
