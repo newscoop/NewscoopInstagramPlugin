@@ -32,9 +32,9 @@ class InstagramController extends Controller
         $criteria = new InstagramPhotoCriteria();
         
         // params
-        $search = $this->_getParam('search');
-        $perPage = $this->_getParam('perPage');
-        $offset = $this->_getParam('offset');
+        $search = $this->_getParam('search', $request);
+        $perPage = $this->_getParam('perPage', $request);
+        $offset = $this->_getParam('offset', $request);
 
         if ($search) {
             $criteria->query = $search;
@@ -146,14 +146,14 @@ class InstagramController extends Controller
         return $response;
     }
 
-    public function _getParam($param)
+    public function _getParam($param, Request $request)
     {
-        if ($this->request !== null) {
-            if ($this->request->request->get($param)) {
-                return $this->request->request->get($param);
+        if ($request !== null) {
+            if ($request->request->get($param)) {
+                return $request->request->get($param);
             }
-            if ($this->request->query->get($param)) {
-                return $this->request->query->get($param);
+            if ($request->query->get($param)) {
+                return $request->query->get($param);
             }
         }
 
