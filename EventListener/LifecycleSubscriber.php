@@ -58,6 +58,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
     {
         $tool = new \Doctrine\ORM\Tools\SchemaTool($this->em);
         $tool->dropSchema($this->getClasses(), true);
+        $this->removeJobs();
     }
 
     public static function getSubscribedEvents()
@@ -76,6 +77,16 @@ class LifecycleSubscriber implements EventSubscriberInterface
     {
         foreach ($this->cronjobs as $jobName => $jobConfig) {
             $this->scheduler->registerJob($jobName, $jobConfig);
+        }
+    }
+
+    /**
+     * Remove plugin cron jobs
+     */
+    private function removeJobs()
+    {
+        foreach ($this->cronjobs as $jobName => $jobConfig) {
+            $this->scheduler->removeJob($jobName, $jobConfig);
         }
     }
 
