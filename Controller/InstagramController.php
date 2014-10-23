@@ -88,6 +88,9 @@ class InstagramController extends Controller
         $response->setContent($templatesService->fetchTemplate(
             $templateFile, 
             array(
+                'searchTerm' => $search,
+                'offset' => $offset,
+                'perPage' => $perPage,
                 'instagramPhotos' => $photos, 
                 'instagramPhotoCount' => count($photos),
                 'nextPageUrl' => $nextPageUrl,
