@@ -7,24 +7,17 @@ This Newscoop Plugin adds smarty functions and Admin tools to enable you to inge
 Install instructions for Newscoop v4.3 on OSX with MAMP
 ------------------------
 
-1. Download this repo from github with 'Download ZIP' button
-2. Login to Newscoop Admin and go to Plugins->ManagerPlugins menu
-3. Click 'Private Plugins' tab on the dialog
-4. Upload the downloaded ZIP file to Newscoop using the 'Choose File' and 'Upload' buttons in the 'Upload private plugin' section of the form
-5. Edit the newscoop/application/configs/parameters/custom_parameters.yml file (or create it if it does not exist) and add the following text:
+1. php application/console plugin:install newscoop/instagram-plugin-bundle 
+2. Edit the newscoop/application/configs/parameters/custom_parameters.yml file (or create it if it does not exist) and add the following text:
 ```
 parameters:
     instagram_bundle:
-        client_id: "96554735526e43ca92ce82915054c5a5"
-        client_secret: "c034d3fd55aa4ab69c58bba8d924a245"
+        client_id: "your client id"
+        client_secret: "your client secret"
         baseurl: "https://api.instagram.com/v1/"
         max_count: 500
 ```
-6. Run the following command from the shell:
-```
-php application/console plugin:install newscoop/instagram-plugin-bundle
-```
-7. Run the following command to ingest the initial 500 photos from Instagram:
+3. Run the following command to ingest the initial 500 photos from Instagram:
 ```
 php application/console instagram_photos:ingest lennonwall
 ```
@@ -32,11 +25,7 @@ php application/console instagram_photos:ingest lennonwall
 Update instructions for Newscoop v4.3 on OSX with MAMP
 ------------------------
 
-1. rm -rf plugins/Newscoop/InstagramPluginBundle
-2. edit plugins/available_plugins.json and remove text: "Newscoop\\InstagramPluginBundle\\NewscoopInstagramPluginBundle"
-3. edit composer.json and remove the line: "newscoop/instagram-plugin-bundle": "*", in the "require" section
-4. rm -rf plugins/private_plugins/newscoop-instagram-plugin-bundle-0.0.1.zip
-5. rm -rf cache/*
+1. php application/console plugin:remove newscoop/instagram-plugin-bundle
 6. follow steps for manual install above
 
 
