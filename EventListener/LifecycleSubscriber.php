@@ -29,7 +29,7 @@ class LifecycleSubscriber implements EventSubscriberInterface
         $this->scheduler = $scheduler;
         $this->cronjobs = array(
             "Instagram plugin ingest photos cron job" => array(
-                'command' => $appDirectory . ' instagram_photos:ingest lennonwal 40',
+                'command' => $appDirectory . ' instagram_photos:ingest lennonwall 40',
                 'schedule' => '*/15 * * * *',
             )
         );

@@ -16,6 +16,27 @@
 {% block admin_content %}
 <div class="plugin-container">
     <h4>Instagram Photos</h4>
+    <div>
+        <span><label for="tag">Tag to ingest:</label>
+          <input type="text" id="tag" name="tag" value="{{ tag }}">
+        </span>
+        <span><label for="limit">Number of photo to ingest:</label>
+          <input type="text" id="limit" name="limit" value="{{ limit }}">
+        </span>
+        <span>
+            <button id="runNow">Run Now</button>
+        </span>
+        <span><label for="mins"> or Run every :</label>
+          <input type="text" id="mins" name="mins" value="{{ mins }}"> minutes
+        </span>
+        <span>
+            <button id="saveSchedule">Schedule</button>
+        </span>
+    </div>
+    
+    <br />
+    <br />
+
     <table id="photos-table" class="table table-bordered table-hover" style="word-wrap: break-word;table-layout: fixed;">
         <thead>
             <tr>
@@ -34,6 +55,7 @@
 </div>
 
 <script type="text/javascript">
+
     var dynatable = $('#photos-table').dynatable({
         inputs: {
             paginationClass: 'pagination',
@@ -107,6 +129,42 @@
             flashMessage('Error updating photo status', 'error');
         });
     });
+
+    $('#saveSchedule').live('click', function() {
+        var data = {
+            tag: $('#tag').val(),
+            limit: $('#limit').val(),
+            mins: $('#mins').val()
+        }
+
+        $.post("/admin/instagram", data)
+            .done(function(data) {
+                if (data.status) {
+                    flashMessage('Schedule saved successfully');
+                    return true;
+                }
+            flashMessage('Error saving schedule: ' + data.message, 'error');
+        });
+    });
+
+    $('#runNow').live('click', function() {
+        flashMessage('Processing');
+        var data = {
+            tag: $('#tag').val(),
+            limit: $('#limit').val(),
+        }
+        $.post("/admin/instagram/ingest", data)
+            .done(function(data) {
+                if (data.status) {
+                    flashMessage('Ingest ran successfully: ' + data.message);
+                    // refresh dynatable
+                    dynatable.process();
+                    return true;
+                }
+            flashMessage('Error running ingest: ' + data.message, 'error');
+        });
+    });
+
 </script>
 
 {% endblock %}

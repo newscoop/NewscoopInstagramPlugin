@@ -26,13 +26,96 @@ class AdminController extends Controller
     public function indexAction(Request $request)
     {
         $em = $this->container->get('em');
-        return array();
+        $currentIngestJob = $this->getCurrentJob();
+        $scheduleParts = array();
+        preg_match('/^\*\/([0-9]+) .+/', $currentIngestJob->getSchedule(), $scheduleParts);
+        $mins = $scheduleParts[1];
+        list($console, $command, $tag, $limit) = split(" ", $currentIngestJob->getCommand());
+
+        if ($request->isMethod('POST')) {
+            $newTag = $request->request->get('tag');
+            $newLimit = $request->request->get('limit');
+            $newMins = $request->request->get('mins');
+            try {
+                $newCommand = "$console $command $newTag $newLimit";
+                $newSchedule = "*/$newMins * * * *"; 
+                $currentIngestJob->setCommand($newCommand);
+                $currentIngestJob->setSchedule($newSchedule);
+                $em->flush();
+                $status = true;
+                $message = "";
+            } catch (\Exception $e) {
+                $status = false;
+                $message = $e->getMessage();
+            }
+            // return JSON response with status, message
+            return new JsonResponse(array("status" => $status, "message" => $message));
+        }
+
+        return array(
+            'tag' => $tag,
+            'limit' => $limit,
+            'mins' => $mins
+        );
     }
 
     /**
-     * @Route("admin/instagram/load/", options={"expose"=true})                                                                                         
+     * @Route("admin/instagram/ingest", options={"expose"=true})
      */
-    public function loadPhotosAction(Request $request)                                                                                                         
+    public function ingestAction(Request $request)
+    {
+        $instagramService = $this->container->getService('newscoop_instagram_plugin.instagram_service');
+        $config = $this->container->getParameter('instagram_bundle');
+        $baseurl = $config['baseurl'];
+        $clientId = $config['client_id'];
+        $tag = $request->request->get('tag');
+        $limit = $request->request->get('limit');
+        $photos = array();
+        $photosAdded = 0;
+        $url = $baseurl . "tags/" . $tag . "/media/recent?client_id=" . $clientId;
+
+        try {
+            $client = new \Buzz\Client\Curl();
+            $client->setTimeout(3600);
+            $browser = new \Buzz\Browser($client);
+            $response =  $browser->get($url);
+            $results = json_decode($response->getContent(), true);
+
+            // we must paginate through all the results
+            while (count($photos) < $limit) {
+                $photos = array_merge($photos, $results['data']); 
+                if ($results['pagination']['next_url']) {
+                    $nextUrl = $results['pagination']['next_url'];
+                    $response =  $browser->get($nextUrl);
+                    $results = json_decode($response->getContent(), true);
+                } else {
+                    // we aren't going to get $maxCount
+                    break;
+                }
+            }
+
+            foreach ($photos as $photo) {
+                // check if we already have this photo
+                if (!$instagramService->exists($photo['id'])) {
+                    $instagramPhoto = $instagramService->saveInstagramPhoto($photo);
+                    $photosAdded++;
+                }
+            }
+            $status = true;
+            $message = "Added " . $photosAdded . " photos";
+        } catch(\Exception $e) {
+            $status = false;
+            $message = 'Error: ' . $e->getMessage();
+        }
+
+        return new JsonResponse(array("status" => $status, "message" => $message));
+    }
+
+
+    /**
+     * @Route("admin/instagram/load/", options={"expose"=true})
+     */
+    public function loadPhotosAction(Request $request)
     {   
         $em = $this->get('em');
         $cacheService = $this->get('newscoop.cache');
@@ -40,7 +123,7 @@ class AdminController extends Controller
         $criteria = $this->processRequest($request);
         $photosCount = $instagramService->countBy(array('isActive' => true)); 
         $photosInactiveCount = $instagramService->countBy(array('isActive' => false));
-      
+     
         $cacheKey = array('instagram_photos__'.md5(serialize($criteria)), $photosCount, $photosInactiveCount);
         if ($cacheService->contains($cacheKey)) {
             $responseArray = $cacheService->fetch($cacheKey);                                                                                               
@@ -64,7 +147,7 @@ class AdminController extends Controller
             $responseArray = array(
                 'records' => $processed,
                 'queryRecordCount' => $photos->count,
-                'totalRecordCount'=> count($photos->items)                                                                                                     
+                'totalRecordCount'=> count($photos->items)
             );                                                                                                                                              
             
             $cacheService->save($cacheKey, $responseArray);                                                                                                 
@@ -74,13 +157,26 @@ class AdminController extends Controller
     }
 
     /**
-     * Process request parameters                                                                                                                           
+     * Load current scheduled instagram ingest job
      *
-     * @param Request $request Request object                                                                                                               
-     *
-     * @return InstagramPhotoCriteria                                                                                                                         
+     * @return Newscoop\Entity\CronJob
      */
-    private function processRequest(Request $request)                                                                                                       
+    private function getCurrentJob()
+    {
+        $em = $this->get('em');
+        $schedulerService = $this->get('newscoop.scheduler');
+        $job = $em->getRepository('Newscoop\Entity\CronJob')->findOneByName("Instagram plugin ingest photos cron job");
+        return $job;
+    }
+
+    /**
+     * Process request parameters
+     *
+     * @param Request $request Request object
+     *
+     * @return InstagramPhotoCriteria
+     */
+    private function processRequest(Request $request)
     {   
         $criteria = new InstagramPhotoCriteria();                                                                                                             
         
