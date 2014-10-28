@@ -2,7 +2,7 @@
     "name": "newscoop/instagram-plugin-bundle",
     "description": "Instagram plugin for Newscoop",
     "keywords": ["newscoop", "instagram", "photos"],
-    "version": "0.0.3",
+    "version": "0.0.4",
     "type": "newscoop-plugin",
     "license": "GPL-3.0",
     "authors": [
